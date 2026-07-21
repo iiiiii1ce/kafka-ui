@@ -50,13 +50,12 @@ jobs:
       - name: Generate icon
         run: npm run make-icons
 
-      - name: Bundle Temurin 25 JRE (${{ matrix.platform }}/${{ matrix.arch }})
-        run: node scripts/fetch-jre.mjs --platform=${{ matrix.platform }} --arch=${{ matrix.arch }}
-
       - name: Build fat JAR (frontend included)
         run: npm run build:jar
 
       - name: Package installer
+        # build:mac / build:win fetch the matching platform JRE before packaging,
+        # so the bundled runtime always matches the target OS.
         run: npm run ${{ matrix.build }}
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"

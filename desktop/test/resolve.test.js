@@ -55,6 +55,14 @@ test('findJavaBin prefers bundled jre (mac Contents/Home layout)', () => {
   assert.strictEqual(bin, expected);
 });
 
+test('findJavaBin returns null when bundled is required but missing (no system fallback)', () => {
+  const bin = findJavaBin({
+    resourcesDir: 'C:/app/resources', platform: 'win32',
+    env: { JAVA_HOME: 'C:/java17' }, existsSync: () => false, requireBundled: true,
+  });
+  assert.strictEqual(bin, null);
+});
+
 test('findJavaBin falls back to JAVA_HOME then PATH', () => {
   const resourcesDir = '/app/resources';
   const javaHome = '/opt/jdk25';
