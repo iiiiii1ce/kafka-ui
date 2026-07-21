@@ -56,3 +56,16 @@ test('waitForHealth resolves false on timeout', async () => {
   const ok = await waitForHealth(dead, { timeoutMs: 400, intervalMs: 100 });
   assert.strictEqual(ok, false);
 });
+
+test('waitForHealth aborts early when the backend dies (no long hang)', async () => {
+  const dead = await getFreePort();
+  let died = false;
+  setTimeout(() => { died = true; }, 150);
+  const start = Date.now();
+  const ok = await waitForHealth(dead, {
+    timeoutMs: 30000, intervalMs: 100, shouldAbort: () => died,
+  });
+  const elapsed = Date.now() - start;
+  assert.strictEqual(ok, false);
+  assert.ok(elapsed < 2000, `should abort promptly, took ${elapsed}ms`);
+});

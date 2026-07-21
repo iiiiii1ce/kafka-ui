@@ -36,9 +36,10 @@ function checkHealth(port) {
   });
 }
 
-async function waitForHealth(port, { timeoutMs = 90000, intervalMs = 500, onTick } = {}) {
+async function waitForHealth(port, { timeoutMs = 90000, intervalMs = 500, onTick, shouldAbort } = {}) {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
+    if (shouldAbort && shouldAbort()) return false;
     if (await checkHealth(port)) return true;
     if (onTick) onTick(Date.now() - start);
     await new Promise((r) => setTimeout(r, intervalMs));
@@ -62,10 +63,15 @@ function spawnBackend({ javaBin, jarPath, port, configPath, logStream }) {
   return child;
 }
 
-function killBackend(child) {
+function killBackend(child, { escalateMs = 5000 } = {}) {
   return new Promise((resolve) => {
     if (!child || child.exitCode !== null || child.signalCode !== null) return resolve();
-    treeKill(child.pid, 'SIGTERM', () => resolve());
+    let settled = false;
+    const done = () => { if (!settled) { settled = true; clearTimeout(timer); resolve(); } };
+    child.once('exit', done);
+    // Graceful first; force-kill if the JVM ignores SIGTERM so nothing orphans.
+    const timer = setTimeout(() => treeKill(child.pid, 'SIGKILL', done), escalateMs);
+    treeKill(child.pid, 'SIGTERM', () => {});
   });
 }
 

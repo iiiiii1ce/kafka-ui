@@ -4,9 +4,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
-const args = Object.fromEntries(
-  process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')),
-);
+function parseArgs(argv) {
+  const out = {};
+  for (let i = 0; i < argv.length; i++) {
+    if (!argv[i].startsWith('--')) continue;
+    const key = argv[i].slice(2);
+    if (key.includes('=')) { const [k, v] = key.split('='); out[k] = v; }
+    else if (i + 1 < argv.length && !argv[i + 1].startsWith('--')) { out[key] = argv[++i]; }
+    else { out[key] = true; }
+  }
+  return out;
+}
+const args = parseArgs(process.argv.slice(2));
 const platform = args.platform || (process.platform === 'win32' ? 'win' : process.platform === 'darwin' ? 'mac' : 'linux');
 const arch = args.arch || (process.arch === 'arm64' ? 'aarch64' : 'x64');
 const osMap = { mac: 'mac', win: 'windows', linux: 'linux' };
