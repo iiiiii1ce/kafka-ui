@@ -108,6 +108,32 @@ Two surfaces get real design attention — everything else is native plumbing:
 2. **App icon.** One SVG source → `.icns` (mac), `.ico` (win), `.png`. A committed mark, not
    a generic placeholder.
 
+## Installer behavior (upgrade / replace-in-place)
+
+The installer follows mainstream desktop-app conventions (VS Code / Slack style) so that
+**re-running a newer installer performs an in-place upgrade** — no online update service
+required, entirely offline via manually distributed installers.
+
+1. **Replace the installed version, no side-by-side copies.** A stable, fixed application id
+   (`io.kafbat.ui.desktop`) and product name are set so the platform recognizes a new build
+   as the *same* app: Windows NSIS upgrades in place (removes/overwrites the prior version);
+   macOS overwrites the existing `.app` in `/Applications`.
+2. **Close the running instance during install, relaunch after.** electron-builder NSIS is
+   configured to detect and close a running instance before copying files, and to launch the
+   app when the installer finishes (`runAfterFinish: true`). To make this reliable, the app's
+   single-instance lock also listens for a shutdown signal so the installer can close it
+   cleanly (JVM child terminated first — no orphaned `java` process across the upgrade).
+3. **Best-practice installer UX.**
+   - **Windows (NSIS):** per-user install by default (`perMachine: false`, no admin prompt —
+     the VS Code / Slack model), Start Menu + Desktop shortcuts, `allowToChangeInstallation-
+     Directory: true`, `oneClick: false` (assisted installer with progress + finish page).
+   - **macOS (DMG):** drag-to-Applications window with a custom background image and correct
+     icon placement; installing over an existing copy replaces it.
+
+This is **manual update**, not networked auto-update: the user downloads the new installer and
+runs it. Networked auto-update (`electron-updater` + a feed server) is explicitly out of scope
+because it would require an online service.
+
 ## Build & distribution
 
 - `npm run build:jar` → gradle build with frontend, copy fat jar to `resources/app.jar`.
@@ -120,7 +146,9 @@ Two surfaces get real design attention — everything else is native plumbing:
 
 ## Out of scope (YAGNI for v1)
 
-- Code signing / notarization / auto-update.
+- Code signing / notarization.
+- **Networked** auto-update (`electron-updater` + feed server). In-place upgrade via
+  re-running a manually distributed installer IS in scope; the online update channel is not.
 - Auth, multi-user, RBAC (single local user).
 - Bundling anything beyond the JRE + app JAR.
 - Any change to the Java/React source.
@@ -132,3 +160,6 @@ Two surfaces get real design attention — everything else is native plumbing:
   (`localhost:9092`) → config persists across restart → quit terminates the JVM (no orphan
   `java` process). Windows install/run smoke test.
 - Verify no orphaned JVM on force-quit; verify second launch focuses rather than re-spawns.
+- **Upgrade acceptance:** install v1, launch it, then run the v2 installer while v1 is
+  running → installer closes v1, replaces it in place (no side-by-side copy), relaunches v2;
+  local `dynamic_config.yaml` (in userData, outside the app bundle) survives the upgrade.
