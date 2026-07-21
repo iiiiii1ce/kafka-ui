@@ -5,9 +5,18 @@ name: Desktop app installers
 #   - Windows (x64)  -> NSIS .exe
 # Each runner bundles a matching Temurin 25 JRE and the frontend-included fat JAR.
 # Artifacts are unsigned (v1). Trigger manually or on a version tag.
+#
+# Releases: pushing a `desktop-v*` tag builds and publishes a GitHub Release with
+# both installers attached. A manual run only uploads artifacts unless you fill in
+# the `release_tag` input, in which case it also publishes a Release under that tag.
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Publish a GitHub Release under this tag (e.g. desktop-v0.0.1). Leave empty to only upload build artifacts."
+        required: false
+        default: ""
   push:
     tags:
       - "desktop-v*"
@@ -68,3 +77,40 @@ jobs:
             desktop/dist/*.dmg
             desktop/dist/*.exe
           if-no-files-found: error
+
+  # Publishes a GitHub Release with both installers when triggered by a desktop-v*
+  # tag, or by a manual run that supplies a release_tag input. Runs only after both
+  # platform builds succeed.
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/desktop-v') || github.event.inputs.release_tag != '' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Download installers
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event.inputs.release_tag || github.ref_name }}"
+          mapfile -t FILES < <(find artifacts -type f \( -name '*.dmg' -o -name '*.exe' \))
+          if [ ${#FILES[@]} -eq 0 ]; then
+            echo "No installers found to release." >&2
+            exit 1
+          fi
+          NOTES=$'Self-contained Kafbat UI desktop installers.\n\n- macOS (Apple Silicon): `.dmg`\n- Windows (x64): `.exe`\n\nEach bundles its own Java 25 runtime. Unsigned — on first launch bypass Gatekeeper (macOS: right-click → Open) or SmartScreen (Windows: More info → Run anyway).'
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release upload "$TAG" "${FILES[@]}" --clobber --repo "$REPO"
+          else
+            gh release create "$TAG" "${FILES[@]}" \
+              --repo "$REPO" \
+              --title "Kafbat UI Desktop $TAG" \
+              --notes "$NOTES"
+          fi
