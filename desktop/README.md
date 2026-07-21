@@ -54,10 +54,19 @@ npm test
 ## Building both platforms via CI (recommended)
 
 A Windows `.exe` cannot be built on macOS without wine, and vice versa. The GitHub Actions
-workflow `.github/workflows/desktop-build.yml` builds both installers on native runners
-(macOS arm64 → `.dmg`, Windows x64 → `.exe`), each with a matching bundled JRE. Trigger it
-manually ("Run workflow") or by pushing a `desktop-v*` tag; download the installers from the
-run's artifacts. This is the reliable path to shipping both platforms.
+workflow `.github/workflows/desktop-release.yml` builds both installers on native runners
+(macOS arm64 → `.dmg`, Windows x64 → `.exe`), each with a matching bundled JRE. Push a
+semantic-version tag to build both installers and publish a GitHub Release automatically:
+
+```bash
+git tag v0.0.1
+git push origin v0.0.1
+```
+
+Tags use `vMAJOR.MINOR.PATCH`: increment `PATCH` (last number) for small fixes, `MINOR`
+(middle number) for larger changes, and `MAJOR` (first number) for important or breaking
+changes. The tag is also used as the installer version. This is the reliable path to
+shipping both platforms.
 
 ## Notes
 
