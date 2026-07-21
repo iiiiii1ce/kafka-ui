@@ -2,7 +2,6 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 
 function parseArgs(argv) {
   const out = {};
@@ -24,7 +23,11 @@ const url = `https://api.adoptium.net/v3/binary/latest/25/ga/${osMap[platform]}/
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const resources = path.join(dir, '..', 'resources');
 const jreDir = path.join(resources, 'jre');
-const tmp = path.join(os.tmpdir(), `temurin25-${platform}-${arch}`);
+// Keep the temp dir on the SAME filesystem as jreDir. On Windows CI the repo
+// (D:) and the OS temp dir (C:) are different volumes, and renameSync across
+// volumes fails with EXDEV — so extract under resources/ and rename within it.
+fs.mkdirSync(resources, { recursive: true });
+const tmp = path.join(resources, `.jre-download-${platform}-${arch}`);
 fs.rmSync(tmp, { recursive: true, force: true });
 fs.mkdirSync(tmp, { recursive: true });
 
@@ -48,6 +51,6 @@ const top = fs.readdirSync(tmp).find((f) => fs.statSync(path.join(tmp, f)).isDir
 if (!top) { console.error('Could not locate extracted JRE dir.'); process.exit(1); }
 
 fs.rmSync(jreDir, { recursive: true, force: true });
-fs.mkdirSync(resources, { recursive: true });
 fs.renameSync(path.join(tmp, top), jreDir);
+fs.rmSync(tmp, { recursive: true, force: true });
 console.log('Installed JRE → resources/jre');
