@@ -12,8 +12,8 @@
     "build:jar": "node scripts/build-jar.mjs",
     "fetch-jre": "node scripts/fetch-jre.mjs",
     "prep": "npm run make-icons && npm run build:jar",
-    "build:mac": "electron-builder --mac --arm64",
-    "build:win": "electron-builder --win --x64"
+    "build:mac": "node scripts/fetch-jre.mjs --platform=mac --arch=aarch64 && electron-builder --mac --arm64",
+    "build:win": "node scripts/fetch-jre.mjs --platform=win --arch=x64 && electron-builder --win --x64"
   },
   "devDependencies": {
     "electron": "^33.0.0",

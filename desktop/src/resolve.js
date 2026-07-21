@@ -14,13 +14,17 @@ function findAppJar({ resourcesDir, devLibsDir, existsSync = fs.existsSync, read
   return null;
 }
 
-function findJavaBin({ resourcesDir, platform, env = {}, existsSync = fs.existsSync }) {
+function findJavaBin({ resourcesDir, platform, env = {}, existsSync = fs.existsSync, requireBundled = false }) {
   const binName = platform === 'win32' ? 'java.exe' : 'java';
   const candidates = [
     path.join(resourcesDir, 'jre', 'bin', binName),
     path.join(resourcesDir, 'jre', 'Contents', 'Home', 'bin', binName),
   ];
   for (const c of candidates) if (existsSync(c)) return c;
+  // Packaged builds must use the bundled JRE. Never fall back to a system `java`
+  // of unknown version — a mismatched runtime (e.g. Java 17 vs a Java 25 jar)
+  // fails with a cryptic UnsupportedClassVersionError instead of a clear message.
+  if (requireBundled) return null;
   if (env.JAVA_HOME) {
     const c = path.join(env.JAVA_HOME, 'bin', binName);
     if (existsSync(c)) return c;

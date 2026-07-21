@@ -18,23 +18,30 @@ npm install
 # 1. Icon (once, or when icon.svg changes)
 npm run make-icons
 
-# 2. Bundle a JRE for the target platform
-node scripts/fetch-jre.mjs --platform=mac --arch=aarch64   # or --platform=win --arch=x64
-
-# 3. Build the fat JAR (needs JDK 25)
+# 2. Build the fat JAR (needs JDK 25)
 JAVA_HOME=/path/to/jdk-25 npm run build:jar
 
-# 4. Package installer
+# 3. Package installer — each command fetches the matching platform JRE first,
+#    so the bundled Java 25 runtime always matches the target OS.
 npm run build:mac      # → dist/*.dmg   (Apple Silicon)
-npm run build:win      # → dist/*.exe   (Windows x64; best run on Windows/CI)
+npm run build:win      # → dist/*.exe   (Windows x64; must run on Windows or CI)
 ```
 
 Artifacts land in `desktop/dist/`.
 
+> **Always build the Windows `.exe` on Windows (or CI), never by cross-building
+> `build:win` on macOS.** `build:mac` and `build:win` each overwrite
+> `resources/jre` with the JRE for their own target, so the runtime matches the
+> OS the installer is built on. A Windows installer produced on macOS cannot be
+> code-signed and NSIS packaging requires wine; use the CI workflow below.
+
 ## Run in development
 
+For dev, populate `resources/jre` with a runtime for **your** machine, then start:
+
 ```bash
-JAVA_HOME=/path/to/jdk-25 npm run build:jar   # produce resources/app.jar
+JAVA_HOME=/path/to/jdk-25 npm run build:jar          # produce resources/app.jar
+node scripts/fetch-jre.mjs --platform=mac --arch=aarch64   # your OS/arch
 npm start
 ```
 

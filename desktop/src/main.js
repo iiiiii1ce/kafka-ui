@@ -84,11 +84,20 @@ async function boot() {
       resourcesDir: resDir,
       devLibsDir: path.join(__dirname, '..', '..', 'api', 'build', 'libs'),
     });
-    const javaBin = findJavaBin({ resourcesDir: resDir, platform: process.platform, env: process.env });
+    const javaBin = findJavaBin({
+      resourcesDir: resDir, platform: process.platform, env: process.env,
+      requireBundled: app.isPackaged,
+    });
 
     if (!jarPath) {
       return sendStatus({ error: true, message: 'Application package not found',
         detail: 'app.jar is missing. Run "npm run build:jar" before packaging.' });
+    }
+
+    if (!javaBin) {
+      return sendStatus({ error: true, message: 'Bundled Java runtime not found',
+        detail: 'The installer did not include a Java runtime for this platform. '
+          + 'Reinstall from an installer built for your OS (see desktop/README.md).' });
     }
 
     sendStatus({ message: 'Starting engine…' });
