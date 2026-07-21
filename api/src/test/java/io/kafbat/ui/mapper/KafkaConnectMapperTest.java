@@ -104,6 +104,7 @@ class KafkaConnectMapperTest {
     connectDto.setFailedConnectorsCount(JsonNullable.of(failedConnectors));
     connectDto.setTasksCount(JsonNullable.of(connectors.size() * tasksPerConnector));
     connectDto.setFailedTasksCount(JsonNullable.of(failedTasks));
+    connectDto.setConsumerNamePattern("connect-%s");
 
     KafkaConnectMapper mapper = new KafkaConnectMapperImpl();
     ConnectDTO kafkaConnect = mapper.toKafkaConnect(

@@ -21,11 +21,12 @@ record AuditRecord(String timestamp,
                    Object operationParams,
                    OperationResult result) {
 
-  static final JsonMapper MAPPER = new JsonMapper();
-
-  static {
-    MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-  }
+  static final JsonMapper MAPPER = JsonMapper.builder()
+      .defaultPropertyInclusion(JsonInclude.Value.construct(
+          JsonInclude.Include.NON_NULL,
+          JsonInclude.Include.NON_NULL
+      ))
+      .build();
 
   @SneakyThrows
   String toJson() {

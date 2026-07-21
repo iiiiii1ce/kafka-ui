@@ -36,6 +36,17 @@ public interface QuorumInfoMapper {
     );
   }
 
-  InternalQuorumInfo.Node toNode(QuorumInfo.Node node);
+  default InternalQuorumInfo.Node toNode(QuorumInfo.Node node) {
+    return new InternalQuorumInfo.Node(
+        node.nodeId(),
+        node.endpoints().stream()
+            .map(endpoint -> new InternalQuorumInfo.RaftVoterEndpoint(
+                endpoint.name(),
+                endpoint.host(),
+                endpoint.port()
+            ))
+            .toList()
+    );
+  }
 
 }

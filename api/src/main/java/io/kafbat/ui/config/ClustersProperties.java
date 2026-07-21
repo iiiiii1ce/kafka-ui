@@ -158,6 +158,7 @@ public class ClustersProperties {
     String password;
     String keystoreLocation;
     String keystorePassword;
+    @Builder.Default
     String consumerNamePattern = "connect-%s";
   }
 
@@ -317,15 +318,18 @@ public class ClustersProperties {
   }
 
   private Map<String, Object> flattenClusterProperties(@Nullable String prefix,
-                                                       @Nullable Map<String, Object> propertiesMap) {
+                                                       @Nullable Map<?, ?> propertiesMap) {
     Map<String, Object> flattened = new HashMap<>();
     if (propertiesMap != null) {
-      propertiesMap.forEach((k, v) -> {
-        String key = prefix == null ? k : prefix + "." + k;
-        if (v instanceof Map<?, ?>) {
-          flattened.putAll(flattenClusterProperties(key, (Map<String, Object>) v));
+      propertiesMap.forEach((rawKey, value) -> {
+        if (!(rawKey instanceof String propertyName)) {
+          throw new IllegalArgumentException("Kafka property keys must be strings: " + rawKey);
+        }
+        String key = prefix == null ? propertyName : prefix + "." + propertyName;
+        if (value instanceof Map<?, ?> nestedProperties) {
+          flattened.putAll(flattenClusterProperties(key, nestedProperties));
         } else {
-          flattened.put(key, v);
+          flattened.put(key, value);
         }
       });
     }

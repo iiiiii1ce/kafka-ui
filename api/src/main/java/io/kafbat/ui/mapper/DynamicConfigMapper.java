@@ -6,7 +6,9 @@ import io.kafbat.ui.model.ApplicationConfigPropertiesAuthOauth2ResourceServerDTO
 import io.kafbat.ui.model.ApplicationConfigPropertiesAuthOauth2ResourceServerJwtDTO;
 import io.kafbat.ui.model.ApplicationConfigPropertiesAuthOauth2ResourceServerOpaquetokenDTO;
 import io.kafbat.ui.model.ApplicationConfigPropertiesDTO;
+import io.kafbat.ui.model.ApplicationConfigPropertiesKafkaClustersInnerAuditDTO;
 import io.kafbat.ui.model.ApplicationConfigPropertiesKafkaClustersInnerDTO;
+import io.kafbat.ui.model.ApplicationConfigPropertiesKafkaClustersInnerKafkaConnectInnerDTO;
 import io.kafbat.ui.model.RbacPermissionDTO;
 import io.kafbat.ui.model.rbac.Permission;
 import io.kafbat.ui.util.DynamicConfigOperations;
@@ -20,10 +22,25 @@ import org.springframework.core.io.Resource;
 @Mapper(componentModel = "spring")
 public interface DynamicConfigMapper {
 
+  @Mapping(target = "kafka.fts", ignore = true)
+  @Mapping(target = "kafka.adminClient", ignore = true)
+  @Mapping(target = "kafka.csv", ignore = true)
+  @Mapping(target = "kafka.messageRelativeTimestamp", ignore = true)
   DynamicConfigOperations.PropertiesStructure fromDto(ApplicationConfigPropertiesDTO dto);
 
   @Mapping(target = "kafka.clusters[].metrics.store", ignore = true)
   ApplicationConfigPropertiesDTO toDto(DynamicConfigOperations.PropertiesStructure propertiesStructure);
+
+  @Mapping(target = "schemaRegistryTopicSubjectSuffix", ignore = true)
+  ClustersProperties.Cluster map(ApplicationConfigPropertiesKafkaClustersInnerDTO cluster);
+
+  @Mapping(target = "requireAuditTopic", ignore = true)
+  ClustersProperties.AuditProperties map(ApplicationConfigPropertiesKafkaClustersInnerAuditDTO audit);
+
+  @Mapping(target = "consumerNamePattern", ignore = true)
+  ClustersProperties.ConnectCluster map(
+      ApplicationConfigPropertiesKafkaClustersInnerKafkaConnectInnerDTO connectCluster
+  );
 
   default String map(Resource resource) {
     return resource.getFilename();
