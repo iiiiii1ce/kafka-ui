@@ -1,0 +1,71 @@
+name: Desktop app installers
+
+# Builds the self-contained Kafbat UI desktop installers on native runners:
+#   - macOS  (arm64) -> .dmg
+#   - Windows (x64)  -> NSIS .exe
+# Each runner bundles a matching Temurin 25 JRE and the frontend-included fat JAR.
+# Artifacts are unsigned (v1). Trigger manually or on a version tag.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "desktop-v*"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            platform: mac
+            arch: aarch64
+            build: build:mac
+          - os: windows-latest
+            platform: win
+            arch: x64
+            build: build:win
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25 (for the fat JAR build)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install desktop dependencies
+        run: npm ci
+
+      - name: Generate icon
+        run: npm run make-icons
+
+      - name: Bundle Temurin 25 JRE (${{ matrix.platform }}/${{ matrix.arch }})
+        run: node scripts/fetch-jre.mjs --platform=${{ matrix.platform }} --arch=${{ matrix.arch }}
+
+      - name: Build fat JAR (frontend included)
+        run: npm run build:jar
+
+      - name: Package installer
+        run: npm run ${{ matrix.build }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: kafbat-ui-desktop-${{ matrix.platform }}
+          path: |
+            desktop/dist/*.dmg
+            desktop/dist/*.exe
+          if-no-files-found: error

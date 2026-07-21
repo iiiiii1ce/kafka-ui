@@ -963,8 +963,10 @@ if (!dl.ok) { console.error('Download failed:', dl.status); process.exit(1); }
 fs.writeFileSync(archive, Buffer.from(await dl.arrayBuffer()));
 
 console.log('Extracting…');
+// bsdtar (default `tar` on macOS and Windows 10+) auto-detects .zip and .tar.gz,
+// so `tar -xf` avoids depending on `unzip` being on PATH (it usually isn't on Windows).
 const ex = isZip
-  ? spawnSync('unzip', ['-q', archive, '-d', tmp], { stdio: 'inherit' })
+  ? spawnSync('tar', ['-xf', archive, '-C', tmp], { stdio: 'inherit' })
   : spawnSync('tar', ['-xzf', archive, '-C', tmp], { stdio: 'inherit' });
 if (ex.status !== 0) { console.error('Extraction failed.'); process.exit(1); }
 

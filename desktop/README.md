@@ -44,6 +44,14 @@ npm start
 npm test
 ```
 
+## Building both platforms via CI (recommended)
+
+A Windows `.exe` cannot be built on macOS without wine, and vice versa. The GitHub Actions
+workflow `.github/workflows/desktop-build.yml` builds both installers on native runners
+(macOS arm64 → `.dmg`, Windows x64 → `.exe`), each with a matching bundled JRE. Trigger it
+manually ("Run workflow") or by pushing a `desktop-v*` tag; download the installers from the
+run's artifacts. This is the reliable path to shipping both platforms.
+
 ## Notes
 
 - **Unsigned (v1):** first launch requires bypassing Gatekeeper (macOS: right-click → Open)
