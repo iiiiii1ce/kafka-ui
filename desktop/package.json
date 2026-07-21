@@ -1,0 +1,26 @@
+{
+  "name": "kafbat-ui-desktop",
+  "version": "0.0.1",
+  "description": "Kafbat UI desktop app (macOS + Windows)",
+  "main": "src/main.js",
+  "author": "kafbat",
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "make-icons": "node scripts/make-icons.mjs",
+    "build:jar": "node scripts/build-jar.mjs",
+    "fetch-jre": "node scripts/fetch-jre.mjs",
+    "prep": "npm run make-icons && npm run build:jar",
+    "build:mac": "electron-builder --mac --arm64",
+    "build:win": "electron-builder --win --x64"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8",
+    "sharp": "^0.33.5"
+  },
+  "dependencies": {
+    "tree-kill": "^1.2.2"
+  }
+}

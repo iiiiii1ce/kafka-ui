@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';" />
+<title>Kafbat UI</title>
+<style>
+  :root {
+    --bg: oklch(0.19 0.012 264);
+    --surface: oklch(0.23 0.014 264);
+    --ink: oklch(0.97 0.005 264);
+    --muted: oklch(0.72 0.012 264);
+    --line: oklch(0.30 0.014 264);
+    --brand: oklch(0.72 0.15 250);
+    --danger: oklch(0.70 0.17 25);
+    --track: oklch(0.30 0.014 264);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: oklch(0.98 0.004 264);
+      --surface: oklch(1 0 0);
+      --ink: oklch(0.22 0.02 264);
+      --muted: oklch(0.48 0.02 264);
+      --line: oklch(0.90 0.01 264);
+      --brand: oklch(0.55 0.16 250);
+      --track: oklch(0.92 0.008 264);
+    }
+  }
+  * { margin: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    display: grid; place-items: center;
+    font: 14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif;
+    color: var(--ink); background: var(--bg);
+    -webkit-user-select: none; user-select: none;
+    overflow: hidden;
+  }
+  .card {
+    width: 420px; padding: 40px 40px 34px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .mark {
+    width: 56px; height: 56px; margin-bottom: 22px;
+    display: grid; place-items: center;
+    border: 1px solid var(--line); border-radius: 15px;
+    background: var(--surface);
+  }
+  .mark svg { width: 30px; height: 30px; display: block; }
+  .dot { fill: var(--brand); }
+  .title { font-size: 19px; font-weight: 650; letter-spacing: -0.01em; }
+  .phase { margin-top: 6px; color: var(--muted); min-height: 1.4em; }
+  .bar {
+    margin-top: 26px; width: 100%; height: 4px; border-radius: 999px;
+    background: var(--track); overflow: hidden; position: relative;
+  }
+  .bar > i {
+    position: absolute; inset: 0; width: 40%; border-radius: 999px;
+    background: var(--brand);
+    animation: slide 1.15s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+  @keyframes slide {
+    0% { left: -42%; } 100% { left: 102%; }
+  }
+  .error { display: none; margin-top: 24px; width: 100%; }
+  .error .msg {
+    color: var(--danger); font-weight: 600; margin-bottom: 4px;
+  }
+  .error .detail {
+    color: var(--muted); font-size: 12.5px; word-break: break-word;
+  }
+  .actions { display: none; gap: 8px; margin-top: 18px; }
+  button {
+    font: inherit; font-weight: 550; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--line);
+    padding: 7px 14px; border-radius: 9px; cursor: pointer;
+  }
+  button.primary { background: var(--brand); color: oklch(0.16 0.02 264); border-color: transparent; }
+  button:hover { filter: brightness(1.06); }
+  body.has-error .bar { display: none; }
+  body.has-error .error,
+  body.has-error .actions { display: flex; flex-direction: column; align-items: center; }
+  body.has-error .actions { flex-direction: row; }
+  @media (prefers-reduced-motion: reduce) {
+    .bar > i { animation: none; width: 100%; left: 0; opacity: 0.85; }
+  }
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle class="dot" cx="6" cy="6" r="2.4"/>
+        <circle class="dot" cx="6" cy="18" r="2.4"/>
+        <circle class="dot" cx="18" cy="12" r="2.4"/>
+        <path d="M6 6v12M6 12h9M15 12l3 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1 class="title">Kafbat UI</h1>
+    <p class="phase" id="phase">Starting…</p>
+    <div class="bar" aria-hidden="true"><i></i></div>
+    <div class="error">
+      <p class="msg" id="err-msg"></p>
+      <p class="detail" id="err-detail"></p>
+    </div>
+    <div class="actions">
+      <button class="primary" id="retry">Retry</button>
+      <button id="logs">Open logs</button>
+    </div>
+  </main>
+  <script>
+    const phaseEl = document.getElementById('phase');
+    const errMsg = document.getElementById('err-msg');
+    const errDetail = document.getElementById('err-detail');
+    document.getElementById('logs').addEventListener('click', () => window.desktopAPI?.openLogs());
+    document.getElementById('retry').addEventListener('click', () => {
+      document.body.classList.remove('has-error');
+      window.desktopAPI?.retry();
+    });
+    window.desktopAPI?.onStatus((s) => {
+      if (s.error) {
+        document.body.classList.add('has-error');
+        errMsg.textContent = s.message || 'Failed to start';
+        errDetail.textContent = s.detail || '';
+      } else {
+        document.body.classList.remove('has-error');
+        phaseEl.textContent = s.message || '';
+      }
+    });
+  </script>
+</body>
+</html>

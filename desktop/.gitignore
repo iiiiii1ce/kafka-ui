@@ -1,0 +1,5 @@
+node_modules/
+resources/
+dist/
+!build/
+build/icon.png

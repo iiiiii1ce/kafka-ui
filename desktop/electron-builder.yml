@@ -1,0 +1,38 @@
+appId: io.kafbat.ui.desktop
+productName: Kafbat UI
+copyright: Copyright © kafbat
+directories:
+  output: dist
+  buildResources: build
+files:
+  - "src/**/*"
+  - "package.json"
+  - "!test/**/*"
+extraResources:
+  - from: "resources/app.jar"
+    to: "app.jar"
+  - from: "resources/jre"
+    to: "jre"
+mac:
+  target:
+    - target: dmg
+      arch: [arm64]
+  category: public.app-category.developer-tools
+  icon: build/icon.png
+  artifactName: "${productName}-${version}-${arch}.${ext}"
+dmg:
+  title: "Install ${productName}"
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icon.png
+  artifactName: "${productName}-Setup-${version}.${ext}"
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  runAfterFinish: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  deleteAppDataOnUninstall: false

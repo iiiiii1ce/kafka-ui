@@ -810,6 +810,12 @@ if (!gotLock) {
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') { shutdown().finally(() => app.quit()); }
   });
+
+  // Terminate the JVM child on OS signals too (e.g. the installer closing the app
+  // during an in-place upgrade), so no orphaned java process survives.
+  for (const sig of ['SIGTERM', 'SIGINT', 'SIGHUP']) {
+    process.on(sig, () => { shutdown().finally(() => app.exit(0)); });
+  }
 }
 ```
 
@@ -911,7 +917,7 @@ const isWin = process.platform === 'win32';
 const gradlew = path.join(repo, isWin ? 'gradlew.bat' : 'gradlew');
 
 console.log('Building fat JAR (frontend included). Requires JDK 25 on JAVA_HOME.');
-const res = spawnSync(gradlew, [':api:clean', ':api:bootJar', '-Pinclude-frontend', '-x', 'test'], {
+const res = spawnSync(gradlew, [':api:clean', ':api:bootJar', '-Pinclude-frontend=true', '-x', 'test'], {
   cwd: repo, stdio: 'inherit', shell: isWin,
 });
 if (res.status !== 0) { console.error('Gradle build failed.'); process.exit(res.status ?? 1); }
@@ -963,8 +969,10 @@ if (!dl.ok) { console.error('Download failed:', dl.status); process.exit(1); }
 fs.writeFileSync(archive, Buffer.from(await dl.arrayBuffer()));
 
 console.log('Extracting…');
+// bsdtar (default `tar` on macOS and Windows 10+) auto-detects .zip and .tar.gz,
+// so `tar -xf` avoids depending on `unzip` being on PATH (it usually isn't on Windows).
 const ex = isZip
-  ? spawnSync('unzip', ['-q', archive, '-d', tmp], { stdio: 'inherit' })
+  ? spawnSync('tar', ['-xf', archive, '-C', tmp], { stdio: 'inherit' })
   : spawnSync('tar', ['-xzf', archive, '-C', tmp], { stdio: 'inherit' });
 if (ex.status !== 0) { console.error('Extraction failed.'); process.exit(1); }
 
