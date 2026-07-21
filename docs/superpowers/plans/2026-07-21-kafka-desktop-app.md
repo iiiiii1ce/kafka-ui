@@ -810,6 +810,12 @@ if (!gotLock) {
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') { shutdown().finally(() => app.quit()); }
   });
+
+  // Terminate the JVM child on OS signals too (e.g. the installer closing the app
+  // during an in-place upgrade), so no orphaned java process survives.
+  for (const sig of ['SIGTERM', 'SIGINT', 'SIGHUP']) {
+    process.on(sig, () => { shutdown().finally(() => app.exit(0)); });
+  }
 }
 ```
 
