@@ -911,7 +911,7 @@ const isWin = process.platform === 'win32';
 const gradlew = path.join(repo, isWin ? 'gradlew.bat' : 'gradlew');
 
 console.log('Building fat JAR (frontend included). Requires JDK 25 on JAVA_HOME.');
-const res = spawnSync(gradlew, [':api:clean', ':api:bootJar', '-Pinclude-frontend', '-x', 'test'], {
+const res = spawnSync(gradlew, [':api:clean', ':api:bootJar', '-Pinclude-frontend=true', '-x', 'test'], {
   cwd: repo, stdio: 'inherit', shell: isWin,
 });
 if (res.status !== 0) { console.error('Gradle build failed.'); process.exit(res.status ?? 1); }
