@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "start": "electron .",
-    "test": "node --test test/",
+    "test": "node --test test/*.test.js",
     "make-icons": "node scripts/make-icons.mjs",
     "build:jar": "node scripts/build-jar.mjs",
     "fetch-jre": "node scripts/fetch-jre.mjs",
