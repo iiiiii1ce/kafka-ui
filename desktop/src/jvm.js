@@ -65,7 +65,7 @@ function spawnBackend({ javaBin, jarPath, port, configPath, logStream }) {
 
 function killBackend(child, { escalateMs = 5000 } = {}) {
   return new Promise((resolve) => {
-    if (!child || child.exitCode !== null || child.signalCode !== null) return resolve();
+    if (!child || !child.pid || child.exitCode !== null || child.signalCode !== null) return resolve();
     let settled = false;
     const done = () => { if (!settled) { settled = true; clearTimeout(timer); resolve(); } };
     child.once('exit', done);
