@@ -4,8 +4,10 @@ import { useFormContext } from 'react-hook-form';
 import SectionHeader from 'widgets/ClusterConfigForm/common/SectionHeader';
 import SSLForm from 'widgets/ClusterConfigForm/common/SSLForm';
 import Credentials from 'widgets/ClusterConfigForm/common/Credentials';
+import { useTranslation } from 'react-i18next';
 
 const KSQL = () => {
+  const { t } = useTranslation();
   const { setValue, watch } = useFormContext();
   const ksql = watch('ksql');
   const [configOpen, setConfigOpen] = useState(false);
@@ -24,22 +26,30 @@ const KSQL = () => {
   return (
     <>
       <SectionHeader
-        title="KSQL DB"
+        title={t('clusterConfig.sections.ksqlDb')}
         adding={!configOpen}
-        addButtonText="Configure KSQL DB"
+        addButtonText={t('clusterConfig.actions.configureTechnical', {
+          section: t('clusterConfig.sections.ksqlDb'),
+        })}
         onClick={toggleConfig}
       />
       {configOpen && (
         <>
           <Input
-            label="URL *"
+            label={t('clusterConfig.fields.url')}
             name="ksql.url"
             type="text"
             placeholder="http://localhost:8088"
             withError
           />
-          <Credentials prefix="ksql" title="Is KSQL DB secured with auth?" />
-          <SSLForm prefix="ksql.keystore" title="KSQL DB Keystore" />
+          <Credentials
+            prefix="ksql"
+            title={t('clusterConfig.questions.ksqlAuth')}
+          />
+          <SSLForm
+            prefix="ksql.keystore"
+            title={t('clusterConfig.sections.ksqlKeystore')}
+          />
         </>
       )}
     </>

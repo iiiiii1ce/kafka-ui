@@ -17,8 +17,10 @@ import { MASKING_OPTIONS } from 'lib/constants';
 import ControlledSelect from 'components/common/Select/ControlledSelect';
 import { FormError } from 'components/common/Input/Input.styled';
 import { ErrorMessage } from '@hookform/error-message';
+import { useTranslation } from 'react-i18next';
 
 const Fields = ({ nestedIdx }: { nestedIdx: number }) => {
+  const { t } = useTranslation();
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -34,9 +36,9 @@ const Fields = ({ nestedIdx }: { nestedIdx: number }) => {
           {fields.map((item, index) => (
             <FieldContainer key={item.id}>
               <Input
-                label="Field"
+                label={t('clusterConfig.fields.field')}
                 name={`masking.${nestedIdx}.fields.${index}.value`}
-                placeholder="Field"
+                placeholder={t('clusterConfig.fields.field')}
                 type="text"
                 withError
               />
@@ -46,7 +48,9 @@ const Fields = ({ nestedIdx }: { nestedIdx: number }) => {
                   style={{ marginTop: '18px' }}
                   onClick={() => remove(index)}
                 >
-                  <IconButtonWrapper aria-label="deleteProperty">
+                  <IconButtonWrapper
+                    aria-label={t('clusterConfig.actions.removeItem')}
+                  >
                     <CloseCircleIcon aria-hidden />
                   </IconButtonWrapper>
                 </S.RemoveButton>
@@ -63,7 +67,7 @@ const Fields = ({ nestedIdx }: { nestedIdx: number }) => {
           onClick={handleAppend}
         >
           <PlusIcon />
-          Add Field
+          {t('clusterConfig.actions.addField')}
         </Button>
       </FieldWrapper>
 
@@ -75,6 +79,7 @@ const Fields = ({ nestedIdx }: { nestedIdx: number }) => {
 };
 
 const MaskingCharReplacement = ({ nestedIdx }: { nestedIdx: number }) => {
+  const { t } = useTranslation();
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -90,9 +95,9 @@ const MaskingCharReplacement = ({ nestedIdx }: { nestedIdx: number }) => {
           {fields.map((item, index) => (
             <FieldContainer key={item.id}>
               <Input
-                label="Field"
+                label={t('clusterConfig.fields.field')}
                 name={`masking.${nestedIdx}.maskingCharsReplacement.${index}.value`}
-                placeholder="Field"
+                placeholder={t('clusterConfig.fields.field')}
                 type="text"
                 withError
               />
@@ -102,7 +107,9 @@ const MaskingCharReplacement = ({ nestedIdx }: { nestedIdx: number }) => {
                   style={{ marginTop: '18px' }}
                   onClick={() => remove(index)}
                 >
-                  <IconButtonWrapper aria-label="deleteProperty">
+                  <IconButtonWrapper
+                    aria-label={t('clusterConfig.actions.removeItem')}
+                  >
                     <CloseCircleIcon aria-hidden />
                   </IconButtonWrapper>
                 </S.RemoveButton>
@@ -119,7 +126,7 @@ const MaskingCharReplacement = ({ nestedIdx }: { nestedIdx: number }) => {
           onClick={handleAppend}
         >
           <PlusIcon />
-          Add Masking Chars Replacement
+          {t('clusterConfig.actions.addMaskingReplacement')}
         </Button>
       </FieldWrapper>
 
@@ -131,6 +138,7 @@ const MaskingCharReplacement = ({ nestedIdx }: { nestedIdx: number }) => {
 };
 
 const Masking = () => {
+  const { t } = useTranslation();
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -149,12 +157,22 @@ const Masking = () => {
   const toggleConfig = () => (fields.length === 0 ? handleAppend() : remove());
 
   const hasFields = fields.length > 0;
+  const maskingOptions = React.useMemo(
+    () =>
+      MASKING_OPTIONS.map((option) => ({
+        ...option,
+        label: t(`clusterConfig.options.${option.value.toLowerCase()}`),
+      })),
+    [t]
+  );
 
   return (
     <>
       <SectionHeader
-        title="Masking"
-        addButtonText="Configure Masking"
+        title={t('clusterConfig.sections.masking')}
+        addButtonText={t('clusterConfig.actions.configure', {
+          section: t('clusterConfig.sections.masking'),
+        })}
         adding={!hasFields}
         onClick={toggleConfig}
       />
@@ -166,40 +184,42 @@ const Masking = () => {
                 <FlexGrow1>
                   <ControlledSelect
                     name={`masking.${index}.type`}
-                    label="Masking Type *"
-                    placeholder="Choose masking type"
-                    options={MASKING_OPTIONS}
+                    label={t('clusterConfig.fields.maskingType')}
+                    placeholder={t('clusterConfig.placeholders.maskingType')}
+                    options={maskingOptions}
                   />
                   <Fields nestedIdx={index} />
                   <Input
-                    label="Fields name pattern"
+                    label={t('clusterConfig.fields.fieldsNamePattern')}
                     name={`masking.${index}.fieldsNamePattern`}
-                    placeholder="Pattern"
+                    placeholder={t('clusterConfig.placeholders.pattern')}
                     type="text"
                     withError
                   />
                   <MaskingCharReplacement nestedIdx={index} />
                   <Input
-                    label="Replacement"
+                    label={t('clusterConfig.fields.replacement')}
                     name={`masking.${index}.replacement`}
-                    placeholder="Replacement"
+                    placeholder={t('clusterConfig.fields.replacement')}
                     type="text"
                   />
                   <Input
-                    label="Topic Keys Pattern"
+                    label={t('clusterConfig.fields.optionalTopicKeysPattern')}
                     name={`masking.${index}.topicKeysPattern`}
-                    placeholder="Keys pattern"
+                    placeholder={t('clusterConfig.placeholders.keysPattern')}
                     type="text"
                   />
                   <Input
-                    label="Topic Values Pattern"
+                    label={t('clusterConfig.fields.optionalTopicValuesPattern')}
                     name={`masking.${index}.topicValuesPattern`}
-                    placeholder="Values pattern"
+                    placeholder={t('clusterConfig.placeholders.valuesPattern')}
                     type="text"
                   />
                 </FlexGrow1>
                 <S.RemoveButton onClick={() => remove(index)}>
-                  <IconButtonWrapper aria-label="deleteProperty">
+                  <IconButtonWrapper
+                    aria-label={t('clusterConfig.actions.removeItem')}
+                  >
                     <CloseCircleIcon aria-hidden />
                   </IconButtonWrapper>
                 </S.RemoveButton>
@@ -215,7 +235,7 @@ const Masking = () => {
             onClick={handleAppend}
           >
             <PlusIcon />
-            Add Masking
+            {t('clusterConfig.actions.addMasking')}
           </Button>
         </S.GroupFieldWrapper>
       )}

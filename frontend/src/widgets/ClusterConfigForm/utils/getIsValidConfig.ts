@@ -1,5 +1,6 @@
 import { ApplicationConfigValidation } from 'generated-sources';
 import { showAlert } from 'lib/errorHandling';
+import i18n from 'i18n';
 
 export const getIsValidConfig = (
   { clusters }: ApplicationConfigValidation,
@@ -13,7 +14,7 @@ export const getIsValidConfig = (
     isValid = false;
     showAlert('error', {
       id: `${prefix}-kafka`,
-      title: 'Kafka Cluster',
+      title: i18n.t('clusterConfig.sections.kafkaCluster'),
       message: clusterErrors?.kafka.errorMessage,
     });
   }
@@ -21,7 +22,7 @@ export const getIsValidConfig = (
     isValid = false;
     showAlert('error', {
       id: `${prefix}-schemaRegistry`,
-      title: 'Schema Registry',
+      title: i18n.t('clusterConfig.sections.schemaRegistry'),
       message: clusterErrors?.schemaRegistry.errorMessage,
     });
   }
@@ -29,7 +30,7 @@ export const getIsValidConfig = (
     isValid = false;
     showAlert('error', {
       id: `${prefix}-ksqldb`,
-      title: 'KSQL DB',
+      title: i18n.t('clusterConfig.sections.ksqlDb'),
       message: clusterErrors?.ksqldb?.errorMessage,
     });
   }
@@ -39,7 +40,9 @@ export const getIsValidConfig = (
         isValid = false;
         showAlert('error', {
           id: `${prefix}-kafkaConnects-${key}`,
-          title: `Kafka Connect. ${key}`,
+          title: i18n.t('clusterConfig.sections.kafkaConnectNamed', {
+            name: key,
+          }),
           message: val.errorMessage,
         });
       }

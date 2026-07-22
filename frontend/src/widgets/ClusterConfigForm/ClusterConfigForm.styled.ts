@@ -24,6 +24,7 @@ const InputContainer = styled.div`
 `;
 export const ButtonWrapper = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 `;
 export const RemoveButton = styled(IconButtonWrapper)`

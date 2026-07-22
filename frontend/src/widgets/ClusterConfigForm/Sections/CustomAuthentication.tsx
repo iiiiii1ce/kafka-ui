@@ -3,8 +3,10 @@ import { useFormContext } from 'react-hook-form';
 import Input from 'components/common/Input/Input';
 import { convertFormKeyToPropsKey } from 'widgets/ClusterConfigForm/utils/convertFormKeyToPropsKey';
 import SectionHeader from 'widgets/ClusterConfigForm/common/SectionHeader';
+import { useTranslation } from 'react-i18next';
 
 const CustomAuthentication: React.FC = () => {
+  const { t } = useTranslation();
   const { watch, setValue } = useFormContext();
   const customConf = watch('customAuth');
   const hasCustomConfig =
@@ -19,8 +21,10 @@ const CustomAuthentication: React.FC = () => {
   return (
     <>
       <SectionHeader
-        title="Authentication"
-        addButtonText="Configure Authentication"
+        title={t('clusterConfig.sections.authentication')}
+        addButtonText={t('clusterConfig.actions.configure', {
+          section: t('clusterConfig.sections.authentication'),
+        })}
         onClick={remove}
       />
       {hasCustomConfig && (

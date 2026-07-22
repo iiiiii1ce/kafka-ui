@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from 'components/common/Button/Button';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import formSchema from 'widgets/ClusterConfigForm/schema';
+import createFormSchema from 'widgets/ClusterConfigForm/schema';
 import { FlexFieldset, StyledForm } from 'components/common/Form/Form.styled';
 import {
   useUpdateAppConfig,
@@ -25,6 +25,7 @@ import Authentication from 'widgets/ClusterConfigForm/Sections/Authentication/Au
 import KSQL from 'widgets/ClusterConfigForm/Sections/KSQL';
 import Masking from 'widgets/ClusterConfigForm/Sections/Masking';
 import { useConfirm } from 'lib/hooks/useConfirm';
+import { useTranslation } from 'react-i18next';
 
 interface ClusterConfigFormProps {
   hasCustomConfig?: boolean;
@@ -39,6 +40,8 @@ const ClusterConfigForm: React.FC<ClusterConfigFormProps> = ({
   initialValues = {},
   hasCustomConfig,
 }) => {
+  const { t } = useTranslation();
+  const formSchema = React.useMemo(() => createFormSchema(t), [t]);
   const navigate = useNavigate();
   const methods = useForm<ClusterConfigFormValues>({
     mode: 'all',
@@ -68,7 +71,7 @@ const ClusterConfigForm: React.FC<ClusterConfigFormProps> = ({
   } = useBoolean();
 
   const confirmClusterDelete = () =>
-    confirm('Are you sure want to delete this cluster?', async () => {
+    confirm(t('clusterConfig.messages.deleteConfirm'), async () => {
       if (initialValues.name) {
         const data = methods.getValues();
         const config = transformFormDataToPayload(data);
@@ -78,8 +81,8 @@ const ClusterConfigForm: React.FC<ClusterConfigFormProps> = ({
         } catch {
           showAlert('error', {
             id: 'app-config-update-error',
-            title: 'Error updating application config',
-            message: 'There was an error updating the application config',
+            title: t('clusterConfig.messages.updateErrorTitle'),
+            message: t('clusterConfig.messages.updateError'),
           });
         }
       }
@@ -93,8 +96,8 @@ const ClusterConfigForm: React.FC<ClusterConfigFormProps> = ({
     } catch {
       showAlert('error', {
         id: 'app-config-update-error',
-        title: 'Error updating application config',
-        message: 'There was an error updating the application config',
+        title: t('clusterConfig.messages.updateErrorTitle'),
+        message: t('clusterConfig.messages.updateError'),
       });
     }
   };
@@ -113,14 +116,14 @@ const ClusterConfigForm: React.FC<ClusterConfigFormProps> = ({
       const isConfigValid = getIsValidConfig(response, data.name);
       if (isConfigValid) {
         showSuccessAlert({
-          message: 'Configuration is valid',
+          message: t('clusterConfig.status.valid'),
         });
       }
     } catch {
       showAlert('error', {
         id: 'app-config-validate-error',
-        title: 'Error validating application config',
-        message: 'There was an error validating the application config',
+        title: t('clusterConfig.messages.validationErrorTitle'),
+        message: t('clusterConfig.messages.validationError'),
       });
     }
     enableForm();
@@ -158,7 +161,7 @@ const ClusterConfigForm: React.FC<ClusterConfigFormProps> = ({
               onClick={onReset}
               disabled={isSubmitting}
             >
-              Reset
+              {t('clusterConfig.actions.reset')}
             </Button>
             <Button
               buttonSize="L"
@@ -166,7 +169,7 @@ const ClusterConfigForm: React.FC<ClusterConfigFormProps> = ({
               onClick={onValidate}
               disabled={isValidateDisabled}
             >
-              Validate
+              {t('clusterConfig.actions.validate')}
             </Button>
             <Button
               type="submit"
@@ -175,7 +178,7 @@ const ClusterConfigForm: React.FC<ClusterConfigFormProps> = ({
               disabled={isSubmitDisabled}
               inProgress={isSubmitting}
             >
-              Submit
+              {t('clusterConfig.actions.submit')}
             </Button>
             {initialValues.name && (
               <Button
@@ -184,7 +187,7 @@ const ClusterConfigForm: React.FC<ClusterConfigFormProps> = ({
                 inProgress={deleteCluster.isPending}
                 onClick={confirmClusterDelete}
               >
-                Delete
+                {t('clusterConfig.actions.delete')}
               </Button>
             )}
           </S.ButtonWrapper>

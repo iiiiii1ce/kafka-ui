@@ -6,8 +6,10 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import PlusIcon from 'components/common/Icons/PlusIcon';
 import CloseCircleIcon from 'components/common/Icons/CloseCircleIcon';
 import Heading from 'components/common/heading/Heading.styled';
+import { useTranslation } from 'react-i18next';
 
 const PropertiesFields = ({ nestedId }: { nestedId: number }) => {
+  const { t } = useTranslation();
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -16,23 +18,23 @@ const PropertiesFields = ({ nestedId }: { nestedId: number }) => {
 
   return (
     <S.GroupFieldWrapper>
-      <Heading level={4}>Serde properties</Heading>
+      <Heading level={4}>{t('clusterConfig.fields.serdeProperties')}</Heading>
       {fields.map((propsField, propsIndex) => (
         <S.SerdeProperties key={propsField.id}>
           <Input
             name={`serde.${nestedId}.properties.${propsIndex}.key`}
-            placeholder="Key"
+            placeholder={t('clusterConfig.fields.key')}
             type="text"
             withError
           />
           <Input
             name={`serde.${nestedId}.properties.${propsIndex}.value`}
-            placeholder="Value"
+            placeholder={t('clusterConfig.fields.value')}
             type="text"
             withError
           />
           <S.SerdePropertiesActions
-            aria-label="deleteProperty"
+            aria-label={t('clusterConfig.actions.removeItem')}
             onClick={() => remove(propsIndex)}
           >
             <CloseCircleIcon aria-hidden />
@@ -47,7 +49,7 @@ const PropertiesFields = ({ nestedId }: { nestedId: number }) => {
           onClick={() => append({ key: '', value: '' })}
         >
           <PlusIcon />
-          Add Property
+          {t('clusterConfig.actions.addProperty')}
         </Button>
       </div>
     </S.GroupFieldWrapper>

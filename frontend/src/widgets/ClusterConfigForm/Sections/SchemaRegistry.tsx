@@ -4,8 +4,10 @@ import { useFormContext } from 'react-hook-form';
 import SectionHeader from 'widgets/ClusterConfigForm/common/SectionHeader';
 import SSLForm from 'widgets/ClusterConfigForm/common/SSLForm';
 import Credentials from 'widgets/ClusterConfigForm/common/Credentials';
+import { useTranslation } from 'react-i18next';
 
 const SchemaRegistry = () => {
+  const { t } = useTranslation();
   const { setValue, watch } = useFormContext();
   const schemaRegistry = watch('schemaRegistry');
   const [configOpen, setConfigOpen] = useState(false);
@@ -26,15 +28,17 @@ const SchemaRegistry = () => {
   return (
     <>
       <SectionHeader
-        title="Schema Registry"
+        title={t('clusterConfig.sections.schemaRegistry')}
         adding={!configOpen}
-        addButtonText="Configure Schema Registry"
+        addButtonText={t('clusterConfig.actions.configureTechnical', {
+          section: t('clusterConfig.sections.schemaRegistry'),
+        })}
         onClick={toggleConfig}
       />
       {configOpen && (
         <>
           <Input
-            label="URL *"
+            label={t('clusterConfig.fields.url')}
             name="schemaRegistry.url"
             type="text"
             placeholder="http://localhost:8081"
@@ -42,9 +46,12 @@ const SchemaRegistry = () => {
           />
           <Credentials
             prefix="schemaRegistry"
-            title="Is Schema Registry secured with auth?"
+            title={t('clusterConfig.questions.schemaRegistryAuth')}
           />
-          <SSLForm prefix="schemaRegistry.keystore" title="Keystore" />
+          <SSLForm
+            prefix="schemaRegistry.keystore"
+            title={t('clusterConfig.sections.keystore')}
+          />
         </>
       )}
     </>
