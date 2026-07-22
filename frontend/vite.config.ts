@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
   const isDevMode = mode === 'development';
   const isProxy = process.env.VITE_DEV_PROXY;
+  const isCheckerEnabled = process.env.VITE_CHECKER !== 'false';
 
   const defaultPlugins = [
     react(),
@@ -20,14 +21,17 @@ export default defineConfig(({ mode }) => {
 
   const prodPlugins = [...defaultPlugins];
 
-  const devPlugins = [
-    ...defaultPlugins,
-    checker({
-      overlay: { initialIsOpen: false },
-      typescript: true,
-      eslint: { lintCommand: 'eslint --ext .tsx,.ts src/' },
-    }),
-  ];
+  const devPlugins = [...defaultPlugins];
+
+  if (isCheckerEnabled) {
+    devPlugins.push(
+      checker({
+        overlay: { initialIsOpen: false },
+        typescript: true,
+        eslint: { lintCommand: 'eslint --ext .tsx,.ts src/' },
+      })
+    );
+  }
 
   const defaultConfig: UserConfigExport = {
     plugins: isDevMode ? devPlugins : prodPlugins,

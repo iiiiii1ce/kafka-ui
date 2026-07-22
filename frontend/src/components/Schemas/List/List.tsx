@@ -27,10 +27,12 @@ import ResourcePageHeading from 'components/common/ResourcePageHeading/ResourceP
 import useFts from 'components/common/Fts/useFts';
 import Fts from 'components/common/Fts/Fts';
 import ErrorPage from 'components/ErrorPage/ErrorPage';
+import { useTranslation } from 'react-i18next';
 
 import GlobalSchemaSelector from './GlobalSchemaSelector/GlobalSchemaSelector';
 
 const List: React.FC = () => {
+  const { t } = useTranslation();
   const { isReadOnly } = React.useContext(ClusterContext);
   const { clusterName } = useAppParams<ClusterNameRoute>();
   const navigate = useNavigate();
@@ -52,7 +54,7 @@ const List: React.FC = () => {
     () => [
       {
         id: SchemaColumnsToSort.SUBJECT,
-        header: 'Subject',
+        header: t('schemas.subject'),
         accessorKey: 'subject',
         // eslint-disable-next-line react/no-unstable-nested-components
         cell: ({ getValue }) => (
@@ -65,35 +67,35 @@ const List: React.FC = () => {
       },
       {
         id: SchemaColumnsToSort.ID,
-        header: 'Id',
+        header: t('schemas.id'),
         accessorKey: 'id',
         size: 120,
       },
       {
         id: SchemaColumnsToSort.TYPE,
-        header: 'Type',
+        header: t('schemas.type'),
         accessorKey: 'schemaType',
         size: 120,
       },
       {
         id: SchemaColumnsToSort.VERSION,
-        header: 'Version',
+        header: t('schemas.version'),
         accessorKey: 'version',
         size: 120,
       },
       {
         id: SchemaColumnsToSort.COMPATIBILITY,
-        header: 'Compatibility',
+        header: t('schemas.compatibility'),
         accessorKey: 'compatibilityLevel',
         size: 160,
       },
     ],
-    []
+    [t]
   );
 
   return (
     <>
-      <ResourcePageHeading text="Schema Registry">
+      <ResourcePageHeading text={t('schemas.title')}>
         {!isReadOnly && (
           <>
             <GlobalSchemaSelector />
@@ -106,7 +108,7 @@ const List: React.FC = () => {
                 action: Action.CREATE,
               }}
             >
-              <PlusIcon /> Create Schema
+              <PlusIcon /> {t('schemas.create')}
             </ActionButton>
           </>
         )}
@@ -114,7 +116,7 @@ const List: React.FC = () => {
       <ControlPanelWrapper hasInput>
         <Search
           key={clusterName}
-          placeholder="Search by Schema Name"
+          placeholder={t('schemas.search')}
           extraActions={<Fts resourceName="schemas" />}
         />
       </ControlPanelWrapper>
@@ -137,7 +139,7 @@ const List: React.FC = () => {
           columns={columns}
           data={schemas.data?.schemas || []}
           pageCount={schemas.data?.pageCount || 1}
-          emptyMessage="No schemas found"
+          emptyMessage={t('schemas.none')}
           onRowClick={(row) =>
             navigate(clusterSchemaPath(clusterName, row.original.subject))
           }

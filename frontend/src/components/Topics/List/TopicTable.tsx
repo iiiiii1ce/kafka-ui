@@ -10,12 +10,14 @@ import { useLocalStoragePersister } from 'components/common/NewTable/ColumnResiz
 import { formatBytes } from 'components/common/BytesFormatted/utils';
 import PageLoader from 'components/common/PageLoader/PageLoader';
 import ErrorPage from 'components/ErrorPage/ErrorPage';
+import { useTranslation } from 'react-i18next';
 
 import { TopicTitleCell } from './TopicTitleCell';
 import ActionsCell from './ActionsCell';
 import BatchActionsbar from './BatchActionsBar';
 
 const TopicTable: React.FC<{ params: GetTopicsRequest }> = ({ params }) => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { isReadOnly } = React.useContext(ClusterContext);
 
@@ -32,7 +34,7 @@ const TopicTable: React.FC<{ params: GetTopicsRequest }> = ({ params }) => {
     () => [
       {
         id: TopicColumnsToSort.NAME,
-        header: 'Topic Name',
+        header: t('topics.name'),
         accessorKey: 'name',
         cell: TopicTitleCell,
         size: 400,
@@ -42,13 +44,13 @@ const TopicTable: React.FC<{ params: GetTopicsRequest }> = ({ params }) => {
       },
       {
         id: TopicColumnsToSort.TOTAL_PARTITIONS,
-        header: 'Partitions',
+        header: t('topics.partitions'),
         accessorKey: 'partitionCount',
         size: 100,
       },
       {
         id: TopicColumnsToSort.OUT_OF_SYNC_REPLICAS,
-        header: 'Out of sync replicas',
+        header: t('topics.outOfSyncReplicas'),
         accessorKey: 'partitions',
         size: 154,
         cell: ({ getValue }) => {
@@ -64,23 +66,23 @@ const TopicTable: React.FC<{ params: GetTopicsRequest }> = ({ params }) => {
       },
       {
         id: TopicColumnsToSort.REPLICATION_FACTOR,
-        header: 'Replication Factor',
+        header: t('topics.replicationFactor'),
         accessorKey: 'replicationFactor',
         size: 148,
         maxSize: 148,
       },
       {
         id: TopicColumnsToSort.MESSAGES_COUNT,
-        header: 'Number of messages',
+        header: t('topics.messageCount'),
         accessorKey: 'messagesCount',
         cell: (args) => {
-          return args.getValue() ?? 'N/A';
+          return args.getValue() ?? t('topics.notAvailable');
         },
         size: 146,
       },
       {
         id: TopicColumnsToSort.SIZE,
-        header: 'Size',
+        header: t('topics.size'),
         accessorKey: 'segmentSize',
         size: 100,
         cell: SizeCell,
@@ -95,7 +97,7 @@ const TopicTable: React.FC<{ params: GetTopicsRequest }> = ({ params }) => {
         size: 60,
       },
     ],
-    []
+    [t]
   );
 
   const columnSizingPersister = useLocalStoragePersister('Topics');
@@ -121,7 +123,7 @@ const TopicTable: React.FC<{ params: GetTopicsRequest }> = ({ params }) => {
       }
       enableColumnResizing
       columnSizingPersister={columnSizingPersister}
-      emptyMessage="No topics found"
+      emptyMessage={t('topics.none')}
     />
   );
 };

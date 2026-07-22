@@ -1,4 +1,8 @@
 import { getSystemTimezone } from 'lib/hooks/useTimezones';
+import i18n, { normalizeLanguage } from 'i18n';
+
+const getDisplayLanguage = () =>
+  normalizeLanguage(i18n.resolvedLanguage || i18n.language);
 
 export const formatTimestamp = ({
   timestamp,
@@ -21,8 +25,7 @@ export const formatTimestamp = ({
     return '';
   }
 
-  // browser support
-  const language = navigator.language || navigator.languages[0];
+  const language = getDisplayLanguage();
 
   const finalTimezone = timezone || getSystemTimezone().value;
 
@@ -97,7 +100,7 @@ export const timeAgo = (
   const diffHours = Math.floor(diffMinutes / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  const language = navigator.language || navigator.languages[0];
+  const language = getDisplayLanguage();
   const rtf = new Intl.RelativeTimeFormat(language, { numeric: 'auto' });
 
   if (diffSeconds < 60) {

@@ -11,9 +11,11 @@ import { ThemeModeContext } from 'components/contexts/ThemeModeContext';
 import ProductHuntIcon from 'components/common/Icons/ProductHuntIcon';
 import { Button } from 'components/common/Button/Button';
 import MenuIcon from 'components/common/Icons/MenuIcon';
+import { useTranslation } from 'react-i18next';
 
 import { UserTimezone } from './UserTimezone/UserTimezone';
 import UserInfo from './UserInfo/UserInfo';
+import LanguageSwitcher from './LanguageSwitcher/LanguageSwitcher';
 import * as S from './NavBar.styled';
 
 interface Props {
@@ -22,44 +24,52 @@ interface Props {
 
 export type ThemeDropDownValue = 'auto_theme' | 'light_theme' | 'dark_theme';
 
-const options = [
-  {
-    label: (
-      <>
-        <AutoIcon />
-        <div>Auto theme</div>
-      </>
-    ),
-    value: 'auto_theme',
-  },
-  {
-    label: (
-      <>
-        <SunIcon />
-        <div>Light theme</div>
-      </>
-    ),
-    value: 'light_theme',
-  },
-  {
-    label: (
-      <>
-        <MoonIcon />
-        <div>Dark theme</div>
-      </>
-    ),
-    value: 'dark_theme',
-  },
-];
-
 const NavBar: React.FC<Props> = ({ onBurgerClick }) => {
   const { themeMode, setThemeMode } = useContext(ThemeModeContext);
+  const { t } = useTranslation();
+  const options = React.useMemo(
+    () => [
+      {
+        label: (
+          <>
+            <AutoIcon />
+            <div>{t('navbar.theme.auto')}</div>
+          </>
+        ),
+        value: 'auto_theme',
+      },
+      {
+        label: (
+          <>
+            <SunIcon />
+            <div>{t('navbar.theme.light')}</div>
+          </>
+        ),
+        value: 'light_theme',
+      },
+      {
+        label: (
+          <>
+            <MoonIcon />
+            <div>{t('navbar.theme.dark')}</div>
+          </>
+        ),
+        value: 'dark_theme',
+      },
+    ],
+    [t]
+  );
 
   return (
-    <S.Navbar role="navigation" aria-label="Page Header">
+    <S.Navbar role="navigation" aria-label={t('navbar.pageHeader')}>
       <S.NavbarBrand>
         <S.NavbarBrand>
-          <Button buttonType="text" buttonSize="S" onClick={onBurgerClick}>
+          <Button
+            aria-label={t('navbar.openMenu')}
+            buttonType="text"
+            buttonSize="S"
+            onClick={onBurgerClick}
+          >
             <MenuIcon />
           </Button>
 
@@ -76,24 +86,32 @@ const NavBar: React.FC<Props> = ({ onBurgerClick }) => {
       <S.NavbarSocial>
         <UserTimezone />
 
+        <LanguageSwitcher />
+
         <Select
           options={options}
           value={themeMode}
           onChange={setThemeMode}
           isThemeMode
         />
-        <S.SocialLink href="https://github.com/kafbat/kafka-ui" target="_blank">
+        <S.SocialLink
+          aria-label="GitHub"
+          href="https://github.com/kafbat/kafka-ui"
+          target="_blank"
+        >
           <GitHubIcon />
         </S.SocialLink>
         <S.SocialLink
           href="https://discord.com/invite/4DWzD7pGE5"
           target="_blank"
+          aria-label="Discord"
         >
           <DiscordIcon />
         </S.SocialLink>
         <S.SocialLink
           href="https://producthunt.com/products/ui-for-apache-kafka"
           target="_blank"
+          aria-label="Product Hunt"
         >
           <ProductHuntIcon />
         </S.SocialLink>

@@ -14,12 +14,14 @@ import { ActionCanButton } from 'components/common/ActionComponent';
 import { useGetUserInfo } from 'lib/hooks/api/roles';
 import { useLocalStoragePersister } from 'components/common/NewTable/ColumnResizer/lib';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import * as S from './Dashboard.styled';
 import ClusterName from './ClusterName';
 import ClusterTableActionsCell from './ClusterTableActionsCell';
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { data } = useGetUserInfo();
   const navigate = useNavigate();
   const clusters = useClusters();
@@ -41,32 +43,32 @@ const Dashboard: React.FC = () => {
   const columns = React.useMemo<ColumnDef<Cluster>[]>(() => {
     const initialColumns: ColumnDef<Cluster>[] = [
       {
-        header: 'Cluster name',
+        header: t('dashboard.clusterName'),
         accessorKey: 'name',
         cell: ClusterName,
         meta: { width: '100%' },
         enableResizing: true,
       },
-      { header: 'Version', accessorKey: 'version', size: 100 },
+      { header: t('dashboard.version'), accessorKey: 'version', size: 100 },
       {
-        header: 'Brokers count',
+        header: t('dashboard.brokerCount'),
         accessorKey: 'brokerCount',
         size: 120,
       },
       {
-        header: 'Partitions',
+        header: t('dashboard.partitions'),
         accessorKey: 'onlinePartitionCount',
         size: 100,
       },
-      { header: 'Topics', accessorKey: 'topicCount', size: 80 },
+      { header: t('dashboard.topics'), accessorKey: 'topicCount', size: 80 },
       {
-        header: 'Production',
+        header: t('dashboard.production'),
         accessorKey: 'bytesInPerSec',
         cell: SizeCell,
         size: 100,
       },
       {
-        header: 'Consumption',
+        header: t('dashboard.consumption'),
         accessorKey: 'bytesOutPerSec',
         cell: SizeCell,
         size: 116,
@@ -83,7 +85,7 @@ const Dashboard: React.FC = () => {
     }
 
     return initialColumns;
-  }, []);
+  }, [appInfo.hasDynamicConfig, t]);
 
   const hasPermissions = useMemo(() => {
     if (!data?.rbacEnabled) return true;
@@ -100,16 +102,20 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <PageHeading text="Dashboard" />
+      <PageHeading text={t('dashboard.title')} />
       <Metrics.Wrapper>
         <Metrics.Section>
-          <Metrics.Indicator label={<Tag color="green">Online</Tag>}>
+          <Metrics.Indicator
+            label={<Tag color="green">{t('dashboard.online')}</Tag>}
+          >
             <span>{config.online || 0}</span>{' '}
-            <Metrics.LightText>clusters</Metrics.LightText>
+            <Metrics.LightText>{t('dashboard.clusters')}</Metrics.LightText>
           </Metrics.Indicator>
-          <Metrics.Indicator label={<Tag color="gray">Offline</Tag>}>
+          <Metrics.Indicator
+            label={<Tag color="gray">{t('dashboard.offline')}</Tag>}
+          >
             <span>{config.offline || 0}</span>{' '}
-            <Metrics.LightText>clusters</Metrics.LightText>
+            <Metrics.LightText>{t('dashboard.clusters')}</Metrics.LightText>
           </Metrics.Indicator>
         </Metrics.Section>
       </Metrics.Wrapper>
@@ -120,7 +126,7 @@ const Dashboard: React.FC = () => {
             checked={showOfflineOnly}
             onChange={toggle}
           />
-          <label>Only offline clusters</label>
+          <label>{t('dashboard.offlineOnly')}</label>
         </div>
         {appInfo.hasDynamicConfig && (
           <ActionCanButton
@@ -129,7 +135,7 @@ const Dashboard: React.FC = () => {
             to={clusterNewConfigPath}
             canDoAction={hasPermissions}
           >
-            Configure new cluster
+            {t('dashboard.configureCluster')}
           </ActionCanButton>
         )}
       </S.Toolbar>
@@ -140,7 +146,9 @@ const Dashboard: React.FC = () => {
         enableSorting
         enableColumnResizing
         columnSizingPersister={columnSizingPersister}
-        emptyMessage={clusters.isFetched ? 'No clusters found' : 'Loading...'}
+        emptyMessage={
+          clusters.isFetched ? t('dashboard.noClusters') : t('common.loading')
+        }
       />
     </>
   );

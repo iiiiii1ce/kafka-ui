@@ -4,10 +4,12 @@ import { Dropdown, DropdownItem } from 'components/common/Dropdown';
 import React, { useMemo, useState } from 'react';
 import Input from 'components/common/Input/Input';
 import { TIMEZONES, useTimezone } from 'lib/hooks/useTimezones';
+import { useTranslation } from 'react-i18next';
 
 import * as S from './UserTimezone.styled';
 
 export const UserTimezone = () => {
+  const { t } = useTranslation();
   const { currentTimezone, availableTimezones, setTimezone } = useTimezone();
 
   const [searchValue, setSearchValue] = useState('');
@@ -52,7 +54,7 @@ export const UserTimezone = () => {
           <Input
             id="user-timezone-search"
             type="text"
-            placeholder="Search timezone..."
+            placeholder={t('navbar.timezoneSearch')}
             value={searchValue}
             onChange={handleSearchChange}
             inputSize="M"

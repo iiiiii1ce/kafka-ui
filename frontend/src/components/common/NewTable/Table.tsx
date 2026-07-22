@@ -23,6 +23,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { PER_PAGE } from 'lib/constants';
 import { Button } from 'components/common/Button/Button';
 import Input from 'components/common/Input/Input';
+import { useTranslation } from 'react-i18next';
 
 import * as S from './Table.styled';
 import updateSortingState from './utils/updateSortingState';
@@ -168,6 +169,7 @@ function Table<TData>({
   columnVisibility,
   onFilterRows,
 }: TableProps<TData>) {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
 
@@ -476,7 +478,7 @@ function Table<TData>({
             {table.getRowModel().rows.length === 0 && (
               <S.Row>
                 <S.EmptyTableMessageCell colSpan={100}>
-                  {emptyMessage || 'No rows found'}
+                  {emptyMessage || t('common.noRows')}
                 </S.EmptyTableMessageCell>
               </S.Row>
             )}
@@ -500,7 +502,7 @@ function Table<TData>({
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              ← Previous
+              ← {t('common.previous')}
             </Button>
             <Button
               buttonType="secondary"
@@ -508,7 +510,7 @@ function Table<TData>({
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Next →
+              {t('common.next')} →
             </Button>
             <Button
               buttonType="secondary"
@@ -520,7 +522,7 @@ function Table<TData>({
             </Button>
 
             <S.GoToPage>
-              <span>Go to page:</span>
+              <span>{t('common.goToPage')}</span>
               <Input
                 type="number"
                 positiveOnly
@@ -537,8 +539,10 @@ function Table<TData>({
           </S.Pages>
           <S.PageInfo>
             <span>
-              Page {table.getState().pagination.pageIndex + 1} of{' '}
-              {table.getPageCount()}{' '}
+              {t('common.pageOf', {
+                current: table.getState().pagination.pageIndex + 1,
+                total: table.getPageCount(),
+              })}
             </span>
           </S.PageInfo>
         </S.Pagination>

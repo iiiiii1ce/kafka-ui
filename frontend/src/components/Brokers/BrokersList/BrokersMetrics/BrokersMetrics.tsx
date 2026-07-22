@@ -1,6 +1,7 @@
 import React from 'react';
 import * as Metrics from 'components/common/Metrics';
 import { ControllerType } from 'generated-sources';
+import { useTranslation } from 'react-i18next';
 
 import * as S from './BrokersMetrics.styled';
 
@@ -27,6 +28,7 @@ export const BrokersMetrics = ({
   onlinePartitionCount,
   controller,
 }: BrokersMetricsProps) => {
+  const { t } = useTranslation();
   const replicas = (inSyncReplicasCount ?? 0) + (outOfSyncReplicasCount ?? 0);
   const areAllInSync = inSyncReplicasCount && replicas === inSyncReplicasCount;
   const partitionIsOffline = offlinePartitionCount && offlinePartitionCount > 0;
@@ -35,28 +37,30 @@ export const BrokersMetrics = ({
 
   return (
     <Metrics.Wrapper>
-      <Metrics.Section title="Uptime">
-        <Metrics.Indicator label="Broker Count">
+      <Metrics.Section title={t('brokers.uptime')}>
+        <Metrics.Indicator label={t('brokers.brokerCount')}>
           {brokerCount}
         </Metrics.Indicator>
 
         <Metrics.Indicator
-          label="Active Controller"
+          label={t('brokers.activeController')}
           isAlert={isActiveControllerUnKnown}
         >
           {isActiveControllerUnKnown ? (
-            <S.DangerText>No Active Controller</S.DangerText>
+            <S.DangerText>{t('brokers.noActiveController')}</S.DangerText>
           ) : (
             activeControllers
           )}
         </Metrics.Indicator>
 
-        <Metrics.Indicator label="Version">{version}</Metrics.Indicator>
+        <Metrics.Indicator label={t('brokers.version')}>
+          {version}
+        </Metrics.Indicator>
       </Metrics.Section>
 
-      <Metrics.Section title="Partitions">
+      <Metrics.Section title={t('brokers.partitions')}>
         <Metrics.Indicator
-          label="Online"
+          label={t('brokers.online')}
           isAlert
           alertType={partitionIsOffline ? 'error' : 'success'}
         >
@@ -66,14 +70,15 @@ export const BrokersMetrics = ({
             onlinePartitionCount
           )}
           <Metrics.LightText>
-            {` of ${(onlinePartitionCount || 0) + (offlinePartitionCount || 0)}
-              `}
+            {t('brokers.of', {
+              total: (onlinePartitionCount || 0) + (offlinePartitionCount || 0),
+            })}
           </Metrics.LightText>
         </Metrics.Indicator>
 
         <Metrics.Indicator
           label="URP"
-          title="Under replicated partitions"
+          title={t('brokers.underReplicatedPartitions')}
           isAlert
           alertType={!underReplicatedPartitionCount ? 'success' : 'error'}
         >
@@ -87,7 +92,7 @@ export const BrokersMetrics = ({
         </Metrics.Indicator>
 
         <Metrics.Indicator
-          label="In Sync Replicas"
+          label={t('brokers.inSyncReplicas')}
           isAlert
           alertType={areAllInSync ? 'success' : 'error'}
         >
@@ -96,14 +101,17 @@ export const BrokersMetrics = ({
           ) : (
             <Metrics.RedText>{inSyncReplicasCount}</Metrics.RedText>
           )}
-          <Metrics.LightText> of {replicas}</Metrics.LightText>
+          <Metrics.LightText>
+            {' '}
+            {t('brokers.of', { total: replicas })}
+          </Metrics.LightText>
         </Metrics.Indicator>
 
-        <Metrics.Indicator label="Out Of Sync Replicas">
+        <Metrics.Indicator label={t('brokers.outOfSyncReplicas')}>
           {outOfSyncReplicasCount}
         </Metrics.Indicator>
 
-        <Metrics.Indicator label="Controller Type">
+        <Metrics.Indicator label={t('brokers.controllerType')}>
           {(() => {
             switch (controller) {
               case ControllerType.KRAFT:
@@ -111,7 +119,7 @@ export const BrokersMetrics = ({
               case ControllerType.ZOOKEEPER:
                 return 'ZooKeeper';
               default:
-                return 'Unknown';
+                return t('common.unknown');
             }
           })()}
         </Metrics.Indicator>

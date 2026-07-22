@@ -14,11 +14,13 @@ import { Button } from 'components/common/Button/Button';
 import ExportIcon from 'components/common/Icons/ExportIcon';
 import PageLoader from 'components/common/PageLoader/PageLoader';
 import ErrorPage from 'components/ErrorPage/ErrorPage';
+import { useTranslation } from 'react-i18next';
 
 import { getBrokersTableColumns, getBrokersTableRows } from './lib';
 import { BrokersMetrics } from './BrokersMetrics/BrokersMetrics';
 
 const BrokersList: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { clusterName } = useAppParams<{ clusterName: ClusterName }>();
   const { data: clusterData } = useClusters();
@@ -67,13 +69,13 @@ const BrokersList: React.FC = () => {
 
         return (
           <>
-            <ResourcePageHeading text="Brokers">
+            <ResourcePageHeading text={t('brokers.title')}>
               <Button
                 buttonType="secondary"
                 buttonSize="M"
                 onClick={handleExportClick}
               >
-                <ExportIcon /> Export CSV
+                <ExportIcon /> {t('common.exportCsv')}
               </Button>
             </ResourcePageHeading>
 
@@ -108,7 +110,7 @@ const BrokersList: React.FC = () => {
                 onRowClick={({ original: { brokerId } }) =>
                   navigate(clusterBrokerPath(clusterName, brokerId))
                 }
-                emptyMessage="No clusters are online"
+                emptyMessage={t('brokers.noneOnline')}
               />
             )}
           </>

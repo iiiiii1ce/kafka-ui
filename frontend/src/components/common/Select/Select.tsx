@@ -5,6 +5,7 @@ import DropdownArrowIcon from 'components/common/Icons/DropdownArrowIcon';
 import * as S from './Select.styled';
 
 export interface SelectProps<T> {
+  'aria-label'?: string;
   options?: SelectOption<T>[];
   id?: string;
   name?: string;
@@ -26,12 +27,13 @@ export interface SelectOption<T> {
 }
 
 // Use the generic type T for forwardRef
-const Select = <T extends object>(
+const Select = <T,>(
   {
     options = [],
     value,
     defaultValue,
     selectSize = 'L',
+    minWidth,
     placeholder = '',
     disabled = false,
     onChange,
@@ -50,6 +52,17 @@ const Select = <T extends object>(
 
   const showOptionsHandler = () => {
     if (!disabled) setShowOptions(!showOptions);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLUListElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      showOptionsHandler();
+    }
+
+    if (event.key === 'Escape') {
+      setShowOptions(false);
+    }
   };
 
   const selectContainerRef = useRef(null);
@@ -83,11 +96,14 @@ const Select = <T extends object>(
     <div ref={selectContainerRef}>
       <S.Select
         role="listbox"
-        selectSize={selectSize}
-        disabled={disabled}
+        $selectSize={selectSize}
+        $disabled={disabled}
+        $minWidth={minWidth}
+        aria-disabled={disabled}
+        aria-expanded={showOptions}
         onClick={showOptionsHandler}
-        onKeyDown={showOptionsHandler}
-        isThemeMode={isThemeMode}
+        onKeyDown={handleKeyDown}
+        $isThemeMode={isThemeMode}
         ref={ref}
         tabIndex={0}
         {...props}
@@ -96,7 +112,7 @@ const Select = <T extends object>(
           <S.SelectedOption
             role="option"
             tabIndex={0}
-            isThemeMode={isThemeMode}
+            $isThemeMode={isThemeMode}
           >
             {displayedOptionLabel}
           </S.SelectedOption>
@@ -105,10 +121,18 @@ const Select = <T extends object>(
           <S.OptionList>
             {options?.map((option) => (
               <S.Option
-                value={option.value.toString()}
-                key={option.value.toString()}
-                disabled={option.disabled}
+                value={String(option.value)}
+                key={String(option.value)}
+                $disabled={option.disabled}
+                aria-disabled={option.disabled}
                 onClick={() => updateSelectedOption(option)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    updateSelectedOption(option);
+                  }
+                }}
                 tabIndex={0}
                 role="option"
               >

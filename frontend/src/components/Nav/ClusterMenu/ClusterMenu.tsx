@@ -18,6 +18,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'lib/hooks/useLocalStorage';
 import { ClusterColorKey } from 'theme/theme';
 import useScrollIntoView from 'lib/hooks/useScrollIntoView';
+import { useTranslation } from 'react-i18next';
 
 interface ClusterMenuProps {
   name: Cluster['name'];
@@ -32,6 +33,7 @@ const ClusterMenu: FC<ClusterMenuProps> = ({
   features,
   opened = false,
 }) => {
+  const { t } = useTranslation();
   const hasFeatureConfigured = (key: ClusterFeaturesEnum) =>
     features?.includes(key);
 
@@ -78,23 +80,23 @@ const ClusterMenu: FC<ClusterMenuProps> = ({
           <MenuItem
             isActive={getIsMenuItemActive(clusterBrokersPath(name))}
             to={clusterBrokersPath(name)}
-            title="Brokers"
+            title={t('nav.brokers')}
           />
           <MenuItem
             isActive={getIsMenuItemActive(clusterTopicsPath(name))}
             to={clusterTopicsPath(name)}
-            title="Topics"
+            title={t('nav.topics')}
           />
           <MenuItem
             isActive={getIsMenuItemActive(clusterConsumerGroupsPath(name))}
             to={clusterConsumerGroupsPath(name)}
-            title="Consumers"
+            title={t('nav.consumers')}
           />
           {hasFeatureConfigured(ClusterFeaturesEnum.SCHEMA_REGISTRY) && (
             <MenuItem
               isActive={getIsMenuItemActive(clusterSchemasPath(name))}
               to={clusterSchemasPath(name)}
-              title="Schema Registry"
+              title={t('nav.schemaRegistry')}
             />
           )}
           {hasFeatureConfigured(ClusterFeaturesEnum.KAFKA_CONNECT) && (
@@ -105,14 +107,14 @@ const ClusterMenu: FC<ClusterMenuProps> = ({
                 getIsMenuItemActive(clusterConnectsPath(name))
               }
               to={kafkaConnectPath(name)}
-              title="Kafka Connect"
+              title={t('nav.kafkaConnect')}
             />
           )}
           {hasFeatureConfigured(ClusterFeaturesEnum.KSQL_DB) && (
             <MenuItem
               isActive={getIsMenuItemActive(clusterKsqlDbPath(name))}
               to={clusterKsqlDbPath(name)}
-              title="KSQL DB"
+              title={t('nav.ksqlDb')}
             />
           )}
           {(hasFeatureConfigured(ClusterFeaturesEnum.KAFKA_ACL_VIEW) ||
@@ -120,7 +122,7 @@ const ClusterMenu: FC<ClusterMenuProps> = ({
             <MenuItem
               isActive={getIsMenuItemActive(clusterACLPath(name))}
               to={clusterACLPath(name)}
-              title="ACL"
+              title={t('nav.acl')}
             />
           )}
         </S.List>

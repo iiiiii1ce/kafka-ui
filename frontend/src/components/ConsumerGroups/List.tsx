@@ -27,8 +27,10 @@ import PageLoader from 'components/common/PageLoader/PageLoader';
 import ErrorPage from 'components/ErrorPage/ErrorPage';
 import { LagTrendComponent } from 'lib/consumerGroups';
 import { useConsumerGroupsLagTrends } from 'components/ConsumerGroups/lib/useConsumerGroupsLagTrends';
+import { useTranslation } from 'react-i18next';
 
 const List = () => {
+  const { t } = useTranslation();
   const { clusterName } = useAppParams<ClusterNameRoute>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ const List = () => {
   const columns: ColumnDef<ConsumerGroup>[] = [
     {
       id: ConsumerGroupOrdering.NAME,
-      header: 'Group ID',
+      header: t('consumers.groupId'),
       accessorKey: 'groupId',
       // eslint-disable-next-line react/no-unstable-nested-components
       cell: ({ getValue }) => (
@@ -79,19 +81,19 @@ const List = () => {
     },
     {
       id: ConsumerGroupOrdering.MEMBERS,
-      header: 'Num Of Members',
+      header: t('consumers.members'),
       accessorKey: 'members',
       size: 140,
     },
     {
       id: ConsumerGroupOrdering.TOPIC_NUM,
-      header: 'Num Of Topics',
+      header: t('consumers.topics'),
       accessorKey: 'topics',
       size: 140,
     },
     {
       id: ConsumerGroupOrdering.MESSAGES_BEHIND,
-      header: 'Consumer Lag',
+      header: t('consumers.lag'),
       accessorKey: 'consumerLag',
       // eslint-disable-next-line react/no-unstable-nested-components
       cell: ({ row }) => {
@@ -104,7 +106,7 @@ const List = () => {
       size: 124,
     },
     {
-      header: 'Coordinator',
+      header: t('consumers.coordinator'),
       accessorKey: 'coordinator.id',
       enableSorting: false,
       size: 104,
@@ -114,7 +116,7 @@ const List = () => {
     },
     {
       id: ConsumerGroupOrdering.STATE,
-      header: 'State',
+      header: t('consumers.state'),
       accessorKey: 'state',
       // eslint-disable-next-line react/no-unstable-nested-components
       cell: (args) => {
@@ -149,7 +151,7 @@ const List = () => {
 
   return (
     <>
-      <ResourcePageHeading text="Consumers">
+      <ResourcePageHeading text={t('consumers.title')}>
         <DownloadCsvButton
           filePrefix={`consumers-${clusterName}`}
           fetchCsv={fetchCsv}
@@ -158,7 +160,7 @@ const List = () => {
       <ControlPanelWrapper hasInput>
         <Search
           key={clusterName}
-          placeholder="Search by Consumer Group ID"
+          placeholder={t('consumers.search')}
           extraActions={<Fts resourceName="consumer_groups" />}
         />
         <RefreshRateSelect storageKey="consumer-groups-refresh-rate" />
@@ -180,7 +182,7 @@ const List = () => {
           pageCount={consumerGroups.data?.pageCount || 0}
           filterPersister={filterPersister}
           data={consumerGroups.data?.consumerGroups || []}
-          emptyMessage="No active consumer groups found"
+          emptyMessage={t('consumers.none')}
           serverSideProcessing
           enableSorting
           onRowClick={({ original }) =>

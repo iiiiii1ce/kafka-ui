@@ -24,8 +24,10 @@ import useAppParams from 'lib/hooks/useAppParams';
 import { ClusterName } from 'lib/interfaces/cluster';
 import { DownloadCsvButton } from 'components/common/DownloadCsvButton/DownloadCsvButton';
 import { topicsApiClient } from 'lib/api';
+import { useTranslation } from 'react-i18next';
 
 const ListPage: React.FC = () => {
+  const { t } = useTranslation();
   const { clusterName } = useAppParams<{ clusterName: ClusterName }>();
   const { isReadOnly } = React.useContext(ClusterContext);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -75,7 +77,7 @@ const ListPage: React.FC = () => {
 
   return (
     <>
-      <ResourcePageHeading text="Topics">
+      <ResourcePageHeading text={t('topics.title')}>
         <>
           {!isReadOnly && (
             <ActionButton
@@ -87,7 +89,7 @@ const ListPage: React.FC = () => {
                 action: Action.CREATE,
               }}
             >
-              <PlusIcon /> Add a Topic
+              <PlusIcon /> {t('topics.add')}
             </ActionButton>
           )}
 
@@ -100,7 +102,7 @@ const ListPage: React.FC = () => {
       <ControlPanelWrapper hasInput>
         <Search
           key={clusterName}
-          placeholder="Search by Topic Name"
+          placeholder={t('topics.search')}
           extraActions={<Fts resourceName="topics" />}
         />
         <label>
@@ -109,7 +111,7 @@ const ListPage: React.FC = () => {
             checked={!searchParams.has('hideInternal')}
             onChange={handleSwitch}
           />
-          Show Internal Topics
+          {t('topics.showInternal')}
         </label>
       </ControlPanelWrapper>
       <Suspense fallback={<PageLoader />}>
